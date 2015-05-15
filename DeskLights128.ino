@@ -43,6 +43,9 @@ uint8_t       msgLen        = 0;              // Empty message
 int           msgX          = 16; // Start off right edge
 String writeCharStr = "";
 
+int aayE,aaxE,aax,aay;
+uint32_t aac;
+
 //ada gfx vars
 int16_t cursor_x_orig = 1;
 int16_t cursor_y_orig = 1;
@@ -931,6 +934,27 @@ void cmd_default(WebServer &server, WebServer::ConnectionType type, char *url_ta
   printOk(server);
 }
 
+void cmd_relay(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
+  URLPARAM_RESULT rc;
+  char name[NAMELEN];
+  char value[VALUELEN];
+  int relayPort = 0;
+  int relayValue = 0;
+  while (strlen(url_tail)) {
+    rc = server.nextURLparam(&url_tail, name, NAMELEN, value, VALUELEN);
+    if ((rc != URLPARAM_EOS)) {
+      if (name[0] == 'i') {
+        relayPort = atoi(value);
+      }
+      if (name[0] == 'v') {
+        relayValue = atoi(value);
+      }
+    }
+  }
+  digitalWrite(relayPort, relayValue);
+  printOk(server);
+}
+
 void cmd_snakemove(WebServer &server, WebServer::ConnectionType type, char *url_tail, bool tail_complete) {
   URLPARAM_RESULT rc;
   char name[NAMELEN];
@@ -1082,6 +1106,8 @@ void cmd_test(WebServer &server, WebServer::ConnectionType type, char *url_tail,
 // begin standard arduino setup and loop pattern
 
 void setup() {
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
   Serial1.begin(9600);
   Ethernet.begin(mac,ip);
   digitalWrite(10, HIGH);
@@ -1114,6 +1140,7 @@ void setup() {
   webserver.addCommand("vu", &cmd_vu);
   webserver.addCommand("snake", &cmd_snakemove);
   webserver.addCommand("alertArea", &cmd_alertArea);
+  webserver.addCommand("relay", &cmd_relay);
   webserver.begin();
   Udp.begin(localPort);
   
