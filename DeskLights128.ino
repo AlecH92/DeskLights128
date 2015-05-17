@@ -607,7 +607,7 @@ void p_cylon(uint32_t c[6]) {
 //visualizer, takes string of 16 numbers which are Y heights
 void vu(String input) {
   uint32_t color = Color(255,0,0);
-  for(int i = 0; i<16; i++) {
+  for(int i = 0; i<max_x; i++) {
     int y = input.charAt(i) - '0';
     if(y > max_y) {
       y = max_y;
@@ -673,7 +673,7 @@ void cmd_vu(WebServer &server, WebServer::ConnectionType type, char *url_tail, b
     if ((rc != URLPARAM_EOS)) {
       switch(name[0]) {
         case 'v':
-        for(int i = 0; i<16; i++) {
+        for(int i = 0; i<max_x; i++) {
           inputData += String(value[i] - '0');
         }
         break;
